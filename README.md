@@ -22,7 +22,7 @@
 | 代码推送到 GitHub | ✅ 完成（`main` 分支，与远程同步） |
 | GitHub Pages 上线 | ✅ 自动开启并构建成功 |
 | **访问地址** | ✅ **https://xiaxinmeng.github.io/** 已可访问，HTTPS 证书正常 |
-| 自定义域名 | ⏸ 已决定**暂不购买**，改用 GitHub Pages 默认地址（免费、永久、自带 HTTPS） |
+| 自定义域名 | ⏸ 已调研免费方案（见第五节）：可用 `xiaxinmeng.is-a.dev`，**国内实测可访问**，待用户决定是否申请 |
 | 页面内容 | ⏸ 仍是占位文字，等真实资料 |
 
 > 说明：原先仓库里的 `CNAME` 曾把站点绑定到 `www.xiaxinmeng.com`，但该域名未注册，导致两个地址都打不开。
@@ -168,15 +168,90 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 
 ---
 
-## 五、以后想绑定自己的域名（可选）
+## 五、免费自定义域名的真相（2026-10 调研）
 
-**不买域名完全没问题。** `https://xiaxinmeng.github.io/` 免费、永久、自带 HTTPS 证书，功能和自定义域名没有区别，唯一差别是地址里带着 `github.io`。
+先纠正一个常见误解：
 
-哪天想换成 `www.xiaxinmeng.com`，按下面五步走。
+> **GitHub Pages 支持免费「绑定」自定义域名，但 GitHub 本身不发域名。**
 
-### 5.1 注册域名
+GitHub 提供的是：无限个自定义域名随便绑、免费自动签发 Let's Encrypt 证书、免费 HTTPS 强制跳转。
+**域名本身**得从别处来——要么花钱买，要么从免费子域名服务白拿。
 
-**`xiaxinmeng.com` 目前还没有被注册**（向 VeriSign 查询的结果是 `No match for "XIAXINMENG.COM"`），所以先要买下来。参考：
+### 5.0 三条路对比
+
+| 方案 | 费用 | 地址长相 | 国内可访问 | 风险 |
+|---|---|---|---|---|
+| **A. 保持现状** | 0 | `xiaxinmeng.github.io` | ✅ 已实测 | 无 |
+| **B. is-a.dev 免费子域** | 0 | `xiaxinmeng.is-a.dev` | ✅ **已实测可用** | 需人工审核；服务由志愿者维护 |
+| **C. 买 `.com`** | ¥60–90/年 | `www.xiaxinmeng.com` | ✅ | 每年续费；不续费会被人抢注 |
+| ~~D. us.kg / DigitalPlat~~ | 0 | `xxx.us.kg` | ❌ **实测 DNS 解析失败** | 不要用 |
+| ~~E. Freenom（.tk/.ml/.ga/.cf）~~ | 0 | — | — | **已停止新注册**，网上那些「镜像站」别碰 |
+
+**其他被排除的选项**
+
+- **eu.org**（1996 年至今的老牌免费域名）：`nic.eu.org` 申请入口能打开，但 `www.eu.org` 实测**连接失败（HTTP 000）**，国内可达性不确定；人工审核 3–7 天到数周。可以试，但不如 is-a.dev 稳。
+- **GitHub Student Developer Pack**：认证学生可领 **Namecheap 免费 `.me` 域名一年**。真免费且是正规顶级域，但要学生身份证明，且**第二年开始收费**（约 $15/年），到期不转会丢失。如果你是学生，这条路比 is-a.dev 更正式。
+- **js.org**：只给 JavaScript 开源项目，个人学术主页不符合。
+
+### 5.1 路线 B：申请 `xiaxinmeng.is-a.dev`（推荐尝试）
+
+**已核实的现状（2026-10-14）**
+
+- 服务由社区志愿者运营，DNS 托管在 Cloudflare（Project Alexandria 赞助），仓库 10k+ star，活跃维护
+- 用 GitHub **提 Pull Request** 的方式注册，不要钱、不要邮箱验证之外的东西
+- **`xiaxinmeng.is-a.dev`、`xinmeng.is-a.dev` 目前都还没被占用**（已用 GitHub API 逐个查过 `domains/*.json`）
+- **国内可访问性已实测**：随机抽了 4 个指向 GitHub Pages 的 is-a.dev 子域，从这台机器访问**全部 HTTP 200**，解析到 `185.199.10x.153`（GitHub Pages 的 IP），耗时 2.8–4.0 秒。也就是说「is-a.dev 子域 + GitHub Pages」这个组合在国内是能正常打开的。
+
+**⚠️ 申请前必须知道的三件事**
+
+1. **内容有领域限制。** ToS 规定「根子域（`yourname.is-a.dev`）**必须与软件开发相关**」，明确禁止「不是主要关于软件开发的博客」。如果你研究方向是计算机/软件，学术主页大概率能过；如果是其他学科，**有被拒的风险**，建议改用嵌套子域（如 `me.xiaxinmeng.is-a.dev`）或走路线 C。
+2. **禁止用 AI 代写 PR。** ToS 原文：强烈反对用 Claude Code / Codex 等 AI 生成 Pull Request，违者**关闭 PR 并可能封禁账号**。所以下面这个文件**请你自己手动敲**（就 7 行），不要让我或任何 AI 代提交。这不是我推脱——替你提交等于把你账号架在火上。
+3. **需要能打开 github.com 网页。** Fork、建文件、提 PR 都得在网页上操作，而这台机器打不开 github.com（见第四节）。**用手机完成，或者挂代理。**
+
+**申请步骤**
+
+1. 手机或代理打开 https://is-a.dev ，搜一下想要的名字确认没被占
+2. Fork https://github.com/is-a-dev/register
+3. 在 `domains/` 目录下新建 `xiaxinmeng.json`（名字换成你要的），手动写入：
+
+   ```json
+   {
+       "owner": {
+           "username": "xiaxinmeng",
+           "email": "663979162@qq.com"
+       },
+       "records": {
+           "CNAME": "xiaxinmeng.github.io"
+       }
+   }
+   ```
+
+   - 字段名是 `records`（复数），写成 `record` 会被 CI 直接刷掉
+   - `username` 必须和提 PR 的 GitHub 账号一致，否则会被拒
+   - CNAME 值**不要**带 `https://`、不要带末尾的点
+   - JSON 提交前用 https://jsonlint.com 验一下语法
+
+4. 提 Pull Request，**留意 review 意见**，被要求修改就照改，不改会被直接关闭
+5. 合并后几分钟内 DNS 生效。**然后才**做下一步（顺序不能反）：
+
+   ```bash
+   cd "C:\Users\xiaxi\Desktop\project\homepage"
+   python tools/set-domain.py xiaxinmeng.is-a.dev
+   git add . && git commit -m "绑定 is-a.dev 子域" && git push
+   ```
+
+   脚本会自动创建 `CNAME` 文件并改齐全站引用。
+
+6. 推送后如果打开是 404，去仓库 **Settings → Pages → Custom domain** 填 `xiaxinmeng.is-a.dev`（其实 `CNAME` 文件已经生效，通常不用手填），并勾上 **Enforce HTTPS**
+
+> 🔁 **万一被拒或服务哪天没了**，一条命令回到默认地址，站点立刻恢复：
+> ```bash
+> python tools/set-domain.py xiaxinmeng.github.io
+> ```
+
+### 5.2 路线 C：买 `.com`
+
+**`xiaxinmeng.com` 目前还没有被注册**（向 VeriSign 查询的结果是 `No match for "XIAXINMENG.COM"`），先买下来：
 
 | 注册商 | 价格参考 | 说明 |
 |---|---|---|
@@ -185,12 +260,17 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 
 买完之后，域名会有一个**管理后台 → DNS 解析设置**的入口，下一步就在那里操作。
 
-### 5.2 用脚本一次性改齐全站域名
+### 5.3 用脚本一次性改齐全站域名
 
-站点地址散落在 5 个文件里（`CNAME` / `index.html` 的 canonical 与 og:url / `404.html` / `robots.txt` / `sitemap.xml`），手动改很容易漏。用脚本一条命令搞定：
+站点地址散落在 5 个文件里（`CNAME` / `index.html` 的 canonical 与 og:url / `404.html` / `robots.txt` / `sitemap.xml`），手动改很容易漏。用脚本一条命令搞定，**路线 B 和路线 C 都用它**：
 
 ```bash
 cd "C:\Users\xiaxi\Desktop\project\homepage"
+
+# 路线 B：is-a.dev 免费子域
+python tools/set-domain.py xiaxinmeng.is-a.dev
+
+# 路线 C：买的 .com
 python tools/set-domain.py www.xiaxinmeng.com
 ```
 
@@ -208,7 +288,12 @@ git add . && git commit -m "绑定自定义域名" && git push
 python tools/set-domain.py xiaxinmeng.github.io
 ```
 
-### 5.3 加 DNS 记录
+> 脚本靠 `KNOWN_HOSTS` 列表识别旧域名。**如果换成上表之外的域名，先把新域名加进 `tools/set-domain.py` 顶部的 `KNOWN_HOSTS`**，否则下次再切换时旧域名认不出来、替换不掉。
+
+### 5.4 加 DNS 记录（仅路线 C 需要）
+
+> 走路线 B（is-a.dev）**不需要这一节**——DNS 由 is-a.dev 托管，你只在 PR 的 JSON 里写一条 CNAME。
+> 下面这张表是买了 `.com` 之后在注册商后台填的。
 
 | 类型 | 主机记录 | 记录值 |
 |---|---|---|
@@ -228,7 +313,7 @@ python tools/set-domain.py xiaxinmeng.github.io
 - 如果注册商要求域名实名认证，先完成认证，否则解析会被拦。
 - 域名指向 GitHub 的境外服务器，**不需要 ICP 备案**；只有将来把站点搬到中国大陆境内的服务器才需要。
 
-### 5.4 验证解析是否生效
+### 5.5 验证解析是否生效
 
 ```bash
 nslookup www.xiaxinmeng.com
@@ -240,17 +325,18 @@ nslookup www.xiaxinmeng.com
 PYTHONIOENCODING=utf-8 python -c "import socket; print(socket.gethostbyname('www.xiaxinmeng.com'))"
 ```
 
-### 5.5 打开 HTTPS
+### 5.6 打开 HTTPS
 
 解析生效后，到仓库 **Settings → Pages**：
 
-- Custom domain 一栏应该已经是 `www.xiaxinmeng.com`（因为仓库里的 `CNAME` 文件已经生效，不用手动再填）
+- Custom domain 一栏应该已经是新域名（因为仓库里的 `CNAME` 文件已经生效，不用手动再填）
 - 等状态变成 **Active** 后，勾选 **Enforce HTTPS**
 - 证书由 Let's Encrypt 自动签发，如果一直转圈，通常是在等 DNS 重新校验，等几小时再看
+- 如果报 SSL 错误，勾上 Enforce HTTPS 基本就能解决（is-a.dev 官方 FAQ 也是这么说的）
 
 > 说明：Pages 本身在代码推送时就已经**自动开启**了（仓库名是 `<用户名>.github.io` 的用户站点仓库，GitHub 会自动处理），Source 是 `main` / 根目录，不需要再去设置。
 
-> ⚠️ **顺序很重要：先买域名、先加解析，最后再改站点域名（5.2）。** 反过来做会让 `xiaxinmeng.github.io` 立刻 301 跳到一个并不存在的域名，站点整个打不开 —— 这次就踩过这个坑。
+> ⚠️ **顺序很重要：先拿到域名（PR 已合并 / 域名已解析），最后再改站点域名（5.3）。** 反过来做会让 `xiaxinmeng.github.io` 立刻 301 跳到一个并不存在的域名，站点整个打不开 —— 这次就踩过这个坑。
 > 万一真踩了，执行 `python tools/set-domain.py xiaxinmeng.github.io` 改回来即可。
 
 ---

@@ -25,6 +25,10 @@ import sys
 KNOWN_HOSTS = [
     r"(?:www\.)?xiaxinmeng\.com",
     r"xiaxinmeng\.github\.io",
+    # 免费子域名服务（is-a.dev 等）。换成别的免费域名时在这里补一行，
+    # 否则下次切换认不出旧域名、替换不掉。
+    r"[\w-]+\.is-a\.dev",
+    r"[\w-]+\.eu\.org",
     r"(?:www\.)?example\.com",
 ]
 
