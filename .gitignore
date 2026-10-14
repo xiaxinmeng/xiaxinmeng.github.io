@@ -11,3 +11,6 @@ dist/
 # 本地私密文件（不希望被提交的内容写在这里）
 *.local
 private/
+
+# WorkBuddy 的项目记忆目录（不随站点发布）
+.workbuddy/
