@@ -56,7 +56,7 @@ python -m http.server 8000
 - 仓库名 `xiaxinmeng.github.io` 是 GitHub 的**用户站点仓库**，站点直接挂在根路径 `/`，所以 `index.html` 放在根目录是正确的。
 - 文件名必须是 `<你的用户名>.github.io`，且在这个用户名下只能有一个。它**必须保持 public** 才能在免费账号下开启 Pages。
 
-> ⚠️ 你之前提到希望项目设为 private。**免费账号无法从 private 仓库发布 GitHub Pages**（需要 GitHub Pro，约 $4/月）。如果坚持要私有源码，改用 Cloudflare Pages 托管（同样免费，且支持私有仓库），做法见 **附录 A**。
+> ✅ 已确认仓库保持 **public**。免费账号的 GitHub Pages 只支持 public 仓库，这个选择刚好合适，不需要任何付费。附录 A 里保留了「将来想改成私有」的做法，用不到可以忽略。
 
 ---
 
@@ -101,6 +101,52 @@ git add .
 git commit -m "更新内容"
 git push
 ```
+
+### 如果 github.com 网页也打不开
+
+这是网络问题，不是账号或仓库的问题。实测你这台机器（2026-10-14）：
+
+| 访问目标 | 结果 |
+|---|---|
+| `www.baidu.com` | ✅ 通，0.1 秒 |
+| `https://github.com` | ❌ 超时（换成美国/新加坡的 IP 重试也一样 → **是按域名拦截的，改 hosts 文件没用**） |
+| `https://www.github.com`、`gist.github.com` | ❌ 超时 |
+| `https://api.github.com` | ✅ 通，0.3 秒 |
+| `codeload.github.com`、`objects.githubusercontent.com` | ✅ 通 |
+| `ssh.github.com:443`、`github.com:22` | ✅ 通 |
+
+所以：**命令行推代码没问题，但网页打不开。** 三条路，按省事程度排序：
+
+**路线 1 · 挂代理 / VPN（最省事，推荐）**
+后面「开启 Pages」「绑定域名」也都要在网页上点，所以迟早需要能打开 github.com。装一个代理软件，浏览器能打开 github.com 之后，按第五节操作即可。
+
+**路线 2 · 用手机操作**
+如果手机能打开 github.com，就在手机上完成「添加 SSH key」和「开启 Pages、绑定域名」这些网页操作。把公钥发到手机上最方便的方式是通过微信「文件传输助手」粘贴给自己。
+
+**路线 3 · 完全不动网页，走 API（因为 api.github.com 是通的）**
+只要有一个 GitHub Token，就能用接口一次性完成「登记 SSH 公钥 + 开启 Pages + 绑定域名」，全程不需要打开 github.com。
+
+1. 在任意能打开 GitHub 的设备上（手机也行）创建 Token：
+   - 打开 https://github.com/settings/tokens → **Generate new token (classic)**
+   - 勾选两个 scope：**`repo`** 和 **`admin:public_key`**
+   - 生成后复制那串 `ghp_...`（只显示一次）
+2. 回到这台电脑，在项目目录执行（把 `ghp_xxx` 换成你的 Token）：
+
+```bash
+cd "C:\Users\xiaxi\Desktop\project\homepage"
+export GITHUB_TOKEN=ghp_xxx
+PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/scripts/configure_github_pages.py" \
+  --repo xiaxinmeng/xiaxinmeng.github.io \
+  --key ~/.ssh/id_ed25519.pub \
+  --domain www.xiaxinmeng.com
+```
+
+脚本会依次：校验 Token → 登记 SSH 公钥（已登记过会自动跳过）→ 开启 Pages（`main` / 根目录）→ 绑定 `www.xiaxinmeng.com` 并开启强制 HTTPS → 打印最终状态。想先空跑看看做了什么，加 `--dry-run`。
+
+3. 完事后建议把这个 Token 删掉：https://github.com/settings/tokens
+
+> ⚠️ 不要为了打开 GitHub 去用不知名的「GitHub 镜像站 / 加速站」并登录账号——你的账号密码和 Token 会经过第三方服务器。要么挂代理，要么用手机，要么走上面这条 API 路线。
+
 
 ---
 
