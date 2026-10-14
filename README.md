@@ -14,6 +14,21 @@
 - 双语：右上角「中 / EN」一键切换
 - 响应式：手机、平板、桌面都适配，支持打印导出为 PDF
 
+### 当前进度（截至 2026-10-14）
+
+| 步骤 | 状态 |
+|---|---|
+| 站点搭建 | ✅ 完成 |
+| 代码推送到 GitHub | ✅ 完成（`bb7dc0a`，`main` 分支） |
+| GitHub Pages 上线 | ✅ 已自动开启并构建成功 |
+| 自定义域名绑定 | ✅ 仓库里的 `CNAME` 已生效，GitHub 已把 `xiaxinmeng.github.io` 301 跳转到 `www.xiaxinmeng.com` |
+| **域名注册** | ❌ **`xiaxinmeng.com` 尚未注册**（WHOIS 返回 No match） |
+| DNS 解析 | ⏸ 等域名注册后才能配置 |
+| HTTPS 证书 | ⏸ 等 DNS 解析生效后自动签发 |
+
+> ⚠️ **在域名注册并解析成功之前，`https://xiaxinmeng.github.io/` 会被 301 跳转到 `www.xiaxinmeng.com`，而那个域名还不存在，所以网站暂时打不开。** 这是正常现象，不是配置错了。
+
+
 ---
 
 ## 一、目录结构
@@ -150,20 +165,20 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 
 ---
 
-## 五、开启 GitHub Pages 并绑定域名
+## 五、让域名能访问（目前只差这一步）
 
-1. 仓库 **Settings** → 左侧 **Pages**
-2. **Source** 选 `Deploy from a branch` → **Branch** 选 `main` → 目录选 `/ (root)` → **Save**
-3. 等 1–2 分钟，浏览器打开 https://xiaxinmeng.github.io/ 应该能看到页面
-4. 回到 **Pages** 页面 → **Custom domain** 填入 `www.xiaxinmeng.com` → **Save**
-   （仓库根目录的 `CNAME` 文件已经写好了同样的值，两边保持一致即可）
-5. 等 DNS 检查通过（十几分钟到几小时），勾选 **Enforce HTTPS**
+### 5.1 先注册域名
 
----
+**`xiaxinmeng.com` 目前还没有被注册**（向 VeriSign 查询的结果是 `No match for "XIAXINMENG.COM"`），所以先要买下来。参考：
 
-## 六、DNS 记录
+| 注册商 | 价格参考 | 说明 |
+|---|---|---|
+| 阿里云 / 腾讯云 | .com 首年约 ¥60–90 | 国内最省事，支付宝付款，DNS 解析免费；需要域名实名认证（一般几分钟到几小时） |
+| Cloudflare / Namecheap | 约 $10/年 | 无实名要求，但需要外币支付方式 |
 
-在域名注册商（阿里云、腾讯云、Cloudflare、Namecheap…）的解析设置里添加：
+买完之后，域名会有一个**管理后台 → DNS 解析设置**的入口，下一步就在那里操作。
+
+### 5.2 加 DNS 记录
 
 | 类型 | 主机记录 | 记录值 |
 |---|---|---|
@@ -177,13 +192,38 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 | AAAA | `@` | `2606:50c0:8002::153` |
 | AAAA | `@` | `2606:50c0:8003::153` |
 
-- `www` 那条是关键，必须填 `xiaxinmeng.github.io`，**不要**填完整 URL、不要带 `https://`、末尾不要加点。
+- `www` 那条是关键。填 `xiaxinmeng.github.io`，**不要**带 `https://`、不要带路径、末尾不要加点。
+- 主机记录：阿里云/腾讯云里 `www` 就填 `www`，根域填 `@`。
 - 根域（`@`）的 A/AAAA 记录是为了让 `xiaxinmeng.com` 也能访问，GitHub 会自动把它跳转到 www。
-- 国内注册商注意：如果注册商要求域名实名认证，先完成认证，否则解析会被拦。
+- 如果注册商要求域名实名认证，先完成认证，否则解析会被拦。
 - 域名指向 GitHub 的境外服务器，**不需要 ICP 备案**；只有将来把站点搬到中国大陆境内的服务器才需要。
-- 验证：`nslookup www.xiaxinmeng.com` 应该返回 `185.199.108.153` 这类地址。
 
-### 关于「仅通过域名访问」
+### 5.3 验证解析是否生效
+
+```bash
+nslookup www.xiaxinmeng.com
+```
+
+返回 `185.199.108.153` 这类地址就说明生效了（通常几分钟，最长 24 小时）。也可以用：
+
+```bash
+PYTHONIOENCODING=utf-8 python -c "import socket; print(socket.gethostbyname('www.xiaxinmeng.com'))"
+```
+
+### 5.4 打开 HTTPS
+
+解析生效后，到仓库 **Settings → Pages**：
+
+- Custom domain 一栏应该已经是 `www.xiaxinmeng.com`（因为仓库里的 `CNAME` 文件已经生效，不用手动再填）
+- 等状态变成 **Active** 后，勾选 **Enforce HTTPS**
+- 证书由 Let's Encrypt 自动签发，如果一直转圈，通常是在等 DNS 重新校验，等几小时再看
+
+> 说明：Pages 本身在代码推送时就已经**自动开启**了（仓库名是 `<用户名>.github.io` 的用户站点仓库，GitHub 会自动处理），Source 是 `main` / 根目录，不需要再去设置。
+
+
+---
+
+## 六、关于「仅通过域名访问」
 
 1. 绑定自定义域名后，访问 `xiaxinmeng.github.io` 会被 GitHub 自动 301 跳转到 `www.xiaxinmeng.com`，对外只有你的域名这一个入口。
 2. **仓库 public ≠ 网页被索引**，但反过来也成立：**仓库 public 意味着源码任何人可见**。个人主页本身没什么秘密，一般不必在意。
@@ -292,13 +332,17 @@ DNS 改完要等 GitHub 重新校验，通常几小时。确认 `CNAME` 文件�
 
 - [x] 站点搭建（首页 + 404 + 样式 + 脚本 + 占位头像/CV）
 - [x] 部署配置文件（`CNAME` / `.nojekyll` / `robots.txt` / `sitemap.xml` / `.gitattributes`）
-- [x] 本地 git 仓库初始化并完成首次提交
-- [x] 远程地址关联到 `xiaxinmeng/xiaxinmeng.github.io`
-- [x] 生成 SSH 密钥并配置 `~/.ssh/config`（走 `ssh.github.com:443` 绕过直连限制）
-- [ ] **把公钥添加到 GitHub**（需要你在浏览器操作，见第四节）
-- [ ] 推送代码
-- [ ] 开启 Pages、绑定域名、配置 DNS 解析
+- [x] 本地 git 仓库初始化，分支统一为 `main`
+- [x] 远程地址关联到 `xiaxinmeng/xiaxinmeng.github.io`（SSH 形式）
+- [x] 生成 SSH 密钥、配置 `~/.ssh/config`（走 `ssh.github.com:443`），公钥已添加到 GitHub
+- [x] **代码已推送**，`main` 分支 → `bb7dc0a`
+- [x] GitHub Pages 自动开启并构建成功（已用自定义域名做 Host 请求验证，能正确返回页面）
+- [x] `CNAME` 生效，`xiaxinmeng.github.io` 已 301 跳转到 `www.xiaxinmeng.com`
+- [ ] **注册 `xiaxinmeng.com`**（WHOIS 查询确认尚未注册）← 当前唯一阻塞项
+- [ ] 配置 DNS 解析（`www` CNAME + 根域 A/AAAA）
+- [ ] 开启 Enforce HTTPS
 - [ ] 用真实资料替换页面上的占位内容
 
 最后更新：2026-10-14
+
 
