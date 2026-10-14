@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.xiaxinmeng.com/sitemap.xml
+Sitemap: https://xiaxinmeng.github.io/sitemap.xml
