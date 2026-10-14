@@ -46,6 +46,25 @@ def build_pattern(new_host):
     return rx, replace
 
 
+def apply_pattern(rx, replace, text):
+    """返回 (新文本, 真正发生变化的处数)。
+
+    只统计「替换结果和原文不同」的位置，这样把域名改成它自己时不会误报。
+    """
+    out = []
+    last = 0
+    changes = 0
+    for m in rx.finditer(text):
+        new = replace(m)
+        out.append(text[last:m.start()])
+        if new != m.group(0):
+            changes += 1
+        out.append(new)
+        last = m.end()
+    out.append(text[last:])
+    return "".join(out), changes
+
+
 def main():
     ap = argparse.ArgumentParser(description="统一修改站点中出现的域名。")
     ap.add_argument("host", help="新域名，例如 www.example.com 或 xiaxinmeng.github.io")
@@ -69,7 +88,7 @@ def main():
             print("  跳过（不存在）: %s" % name)
             continue
         original = open(path, encoding="utf-8").read()
-        text, hits = rx.subn(replace, original)
+        text, hits = apply_pattern(rx, replace, original)
         if hits:
             if not args.dry_run:
                 open(path, "w", encoding="utf-8", newline="\n").write(text)

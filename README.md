@@ -2,9 +2,9 @@
 
 | | |
 |---|---|
+| 访问地址 | **https://xiaxinmeng.github.io/** |
 | 线上仓库 | `git@github.com:xiaxinmeng/xiaxinmeng.github.io.git` |
-| 目标域名 | **https://www.xiaxinmeng.com** |
-| 默认地址 | https://xiaxinmeng.github.io/ （绑定域名后会 301 跳转到你的域名） |
+| 自定义域名 | 暂不购买，将来想用再加（例如 `www.xiaxinmeng.com`，见第五节） |
 | 本地目录 | `C:\Users\xiaxi\Desktop\project\homepage` |
 
 一个**零依赖的纯静态**个人学术主页：只有 HTML / CSS / JS，没有框架、没有构建步骤、没有 npm 依赖。
@@ -19,14 +19,14 @@
 | 步骤 | 状态 |
 |---|---|
 | 站点搭建 | ✅ 完成 |
-| 代码推送到 GitHub | ✅ 完成（`bb7dc0a`，`main` 分支） |
-| GitHub Pages 上线 | ✅ 已自动开启并构建成功 |
-| 自定义域名绑定 | ✅ 仓库里的 `CNAME` 已生效，GitHub 已把 `xiaxinmeng.github.io` 301 跳转到 `www.xiaxinmeng.com` |
-| **域名注册** | ❌ **`xiaxinmeng.com` 尚未注册**（WHOIS 返回 No match） |
-| DNS 解析 | ⏸ 等域名注册后才能配置 |
-| HTTPS 证书 | ⏸ 等 DNS 解析生效后自动签发 |
+| 代码推送到 GitHub | ✅ 完成（`main` 分支，与远程同步） |
+| GitHub Pages 上线 | ✅ 自动开启并构建成功 |
+| **访问地址** | ✅ **https://xiaxinmeng.github.io/** 已可访问，HTTPS 证书正常 |
+| 自定义域名 | ⏸ 已决定**暂不购买**，改用 GitHub Pages 默认地址（免费、永久、自带 HTTPS） |
+| 页面内容 | ⏸ 仍是占位文字，等真实资料 |
 
-> ⚠️ **在域名注册并解析成功之前，`https://xiaxinmeng.github.io/` 会被 301 跳转到 `www.xiaxinmeng.com`，而那个域名还不存在，所以网站暂时打不开。** 这是正常现象，不是配置错了。
+> 说明：原先仓库里的 `CNAME` 曾把站点绑定到 `www.xiaxinmeng.com`，但该域名未注册，导致两个地址都打不开。
+> 现已移除 `CNAME`，全站引用（canonical / og:url / sitemap / robots / 联系方式）统一改回 `xiaxinmeng.github.io`。
 
 
 ---
@@ -37,12 +37,13 @@
 homepage/
 ├── index.html              ← 主页（所有文字内容都在这里改）
 ├── 404.html                ← 找不到页面时显示的页面
-├── CNAME                   ← 自定义域名（值为 www.xiaxinmeng.com）
 ├── robots.txt              ← 搜索引擎抓取规则
 ├── sitemap.xml             ← 站点地图
 ├── .nojekyll               ← 告诉 GitHub Pages 不要用 Jekyll 处理
 ├── .gitattributes          ← 二进制文件不做换行符转换（别删）
 ├── .gitignore
+├── tools/
+│   └── set-domain.py       ← 一键切换站点域名（将来绑域名时用）
 └── assets/
     ├── css/style.css       ← 所有样式（配色变量集中在文件顶部 :root）
     ├── js/main.js          ← 语言切换 / 主题切换 / 导航高亮
@@ -50,6 +51,8 @@ homepage/
     ├── img/favicon.svg     ← 浏览器标签页图标
     └── files/cv.pdf        ← 简历占位 PDF（建议换成你自己的）
 ```
+
+> 没有 `CNAME` 文件是**故意**的：它只在绑定自定义域名时才需要。将来绑域名时 `tools/set-domain.py` 会自动创建。
 
 ---
 
@@ -165,9 +168,13 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 
 ---
 
-## 五、让域名能访问（目前只差这一步）
+## 五、以后想绑定自己的域名（可选）
 
-### 5.1 先注册域名
+**不买域名完全没问题。** `https://xiaxinmeng.github.io/` 免费、永久、自带 HTTPS 证书，功能和自定义域名没有区别，唯一差别是地址里带着 `github.io`。
+
+哪天想换成 `www.xiaxinmeng.com`，按下面五步走。
+
+### 5.1 注册域名
 
 **`xiaxinmeng.com` 目前还没有被注册**（向 VeriSign 查询的结果是 `No match for "XIAXINMENG.COM"`），所以先要买下来。参考：
 
@@ -178,7 +185,30 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 
 买完之后，域名会有一个**管理后台 → DNS 解析设置**的入口，下一步就在那里操作。
 
-### 5.2 加 DNS 记录
+### 5.2 用脚本一次性改齐全站域名
+
+站点地址散落在 5 个文件里（`CNAME` / `index.html` 的 canonical 与 og:url / `404.html` / `robots.txt` / `sitemap.xml`），手动改很容易漏。用脚本一条命令搞定：
+
+```bash
+cd "C:\Users\xiaxi\Desktop\project\homepage"
+python tools/set-domain.py www.xiaxinmeng.com
+```
+
+它会自动创建 `CNAME`，并把所有引用改到新域名（邮件地址不会被误改）。想先看会改什么，加 `--dry-run`。
+
+改完提交推送：
+
+```bash
+git add . && git commit -m "绑定自定义域名" && git push
+```
+
+想改回默认地址，同样一条命令：
+
+```bash
+python tools/set-domain.py xiaxinmeng.github.io
+```
+
+### 5.3 加 DNS 记录
 
 | 类型 | 主机记录 | 记录值 |
 |---|---|---|
@@ -198,7 +228,7 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 - 如果注册商要求域名实名认证，先完成认证，否则解析会被拦。
 - 域名指向 GitHub 的境外服务器，**不需要 ICP 备案**；只有将来把站点搬到中国大陆境内的服务器才需要。
 
-### 5.3 验证解析是否生效
+### 5.4 验证解析是否生效
 
 ```bash
 nslookup www.xiaxinmeng.com
@@ -210,7 +240,7 @@ nslookup www.xiaxinmeng.com
 PYTHONIOENCODING=utf-8 python -c "import socket; print(socket.gethostbyname('www.xiaxinmeng.com'))"
 ```
 
-### 5.4 打开 HTTPS
+### 5.5 打开 HTTPS
 
 解析生效后，到仓库 **Settings → Pages**：
 
@@ -220,14 +250,17 @@ PYTHONIOENCODING=utf-8 python -c "import socket; print(socket.gethostbyname('www
 
 > 说明：Pages 本身在代码推送时就已经**自动开启**了（仓库名是 `<用户名>.github.io` 的用户站点仓库，GitHub 会自动处理），Source 是 `main` / 根目录，不需要再去设置。
 
+> ⚠️ **顺序很重要：先买域名、先加解析，最后再改站点域名（5.2）。** 反过来做会让 `xiaxinmeng.github.io` 立刻 301 跳到一个并不存在的域名，站点整个打不开 —— 这次就踩过这个坑。
+> 万一真踩了，执行 `python tools/set-domain.py xiaxinmeng.github.io` 改回来即可。
 
 ---
 
 ## 六、关于「仅通过域名访问」
 
-1. 绑定自定义域名后，访问 `xiaxinmeng.github.io` 会被 GitHub 自动 301 跳转到 `www.xiaxinmeng.com`，对外只有你的域名这一个入口。
-2. **仓库 public ≠ 网页被索引**，但反过来也成立：**仓库 public 意味着源码任何人可见**。个人主页本身没什么秘密，一般不必在意。
-3. **不想被搜索引擎收录**：把 `index.html` 的 `<head>` 里这一行的注释符去掉
+1. 目前站点只有 `https://xiaxinmeng.github.io/` 一个地址，没有别的入口。
+2. 将来绑定自定义域名后，访问 `xiaxinmeng.github.io` 会被 GitHub 自动 301 跳转到你的域名。
+3. **仓库 public ≠ 网页被索引**，但反过来也成立：**仓库 public 意味着源码任何人可见**。个人主页本身没什么秘密，一般不必在意。
+4. **不想被搜索引擎收录**：把 `index.html` 的 `<head>` 里这一行的注释符去掉
 
    ```html
    <!-- <meta name="robots" content="noindex,nofollow"> -->
@@ -296,6 +329,10 @@ PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/sc
 **推送时提示连接超时**
 先 `ssh -T git@github.com` 看是否能认证。如果是网络原因，试试手机热点或代理。
 
+**网站打不开，浏览器一直跳到一个打不开的地址**
+说明 `CNAME` 文件指向了一个没有注册、或还没解析的域名，而 GitHub 会无条件把 `github.io` 跳过去。
+执行 `python tools/set-domain.py xiaxinmeng.github.io` 就能立刻恢复。
+
 **打开域名显示 404**
 仓库里必须有一个叫 `index.html` 的**根目录**文件；确认 Pages 的 Source 选的是 `main` + `/ (root)`。
 
@@ -331,17 +368,16 @@ DNS 改完要等 GitHub 重新校验，通常几小时。确认 `CNAME` 文件�
 ## 附录 B：本次完成情况
 
 - [x] 站点搭建（首页 + 404 + 样式 + 脚本 + 占位头像/CV）
-- [x] 部署配置文件（`CNAME` / `.nojekyll` / `robots.txt` / `sitemap.xml` / `.gitattributes`）
+- [x] 部署配置文件（`.nojekyll` / `robots.txt` / `sitemap.xml` / `.gitattributes`）
 - [x] 本地 git 仓库初始化，分支统一为 `main`
 - [x] 远程地址关联到 `xiaxinmeng/xiaxinmeng.github.io`（SSH 形式）
 - [x] 生成 SSH 密钥、配置 `~/.ssh/config`（走 `ssh.github.com:443`），公钥已添加到 GitHub
-- [x] **代码已推送**，`main` 分支 → `bb7dc0a`
-- [x] GitHub Pages 自动开启并构建成功（已用自定义域名做 Host 请求验证，能正确返回页面）
-- [x] `CNAME` 生效，`xiaxinmeng.github.io` 已 301 跳转到 `www.xiaxinmeng.com`
-- [ ] **注册 `xiaxinmeng.com`**（WHOIS 查询确认尚未注册）← 当前唯一阻塞项
-- [ ] 配置 DNS 解析（`www` CNAME + 根域 A/AAAA）
-- [ ] 开启 Enforce HTTPS
-- [ ] 用真实资料替换页面上的占位内容
+- [x] 代码已推送，`main` 与 `origin/main` 同步
+- [x] GitHub Pages 自动开启并构建成功
+- [x] **站点正式上线：https://xiaxinmeng.github.io/**（HTTPS 证书正常，各静态资源均 200）
+- [x] 决定暂不购买域名，移除 `CNAME`，全站域名引用统一为 `xiaxinmeng.github.io`
+- [x] 新增 `tools/set-domain.py`，将来绑定/切换域名一条命令搞定
+- [ ] 用真实资料替换页面上的占位内容（姓名、单位、导师、论文、链接、CV、头像）
 
 最后更新：2026-10-14
 
