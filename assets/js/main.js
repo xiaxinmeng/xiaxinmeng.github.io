@@ -89,5 +89,5 @@
   document.querySelectorAll('[data-year]').forEach(function (el) { el.textContent = year; });
 
   /* ---------- 5. 控制台留个小提示 ---------- */
-  console.log('%cXinmeng Xia · xiaxinmeng.github.io', 'color:#1c4e8a;font-weight:600');
+  console.log('%cXinmeng Xia · xiaxinmeng.github.io', 'color:#2d5a8c;font-weight:600');
 })();
