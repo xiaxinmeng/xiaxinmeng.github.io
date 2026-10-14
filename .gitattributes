@@ -1,0 +1,24 @@
+# 统一换行符，避免 Windows / macOS 协作时行尾混乱
+* text=auto eol=lf
+
+# 二进制文件不做任何换行符转换（否则 PDF 内部字节偏移会被破坏）
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.zip  binary
+
+# 这些按文本处理
+*.html   text
+*.css    text
+*.js     text
+*.json   text
+*.md     text
+*.svg    text
+*.xml    text
+*.txt    text
