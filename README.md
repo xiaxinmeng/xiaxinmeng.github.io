@@ -1,10 +1,16 @@
 # 夏新梦 · 个人学术主页
 
-一个**零依赖的纯静态**个人学术主页：只有 HTML / CSS / JS，没有框架、没有构建步骤、没有 npm 依赖。
-放在任何静态托管上都能跑，改内容只需要编辑 `index.html`。
+| | |
+|---|---|
+| 线上仓库 | `git@github.com:xiaxinmeng/xiaxinmeng.github.io.git` |
+| 目标域名 | **https://www.xiaxinmeng.com** |
+| 默认地址 | https://xiaxinmeng.github.io/ （绑定域名后会 301 跳转到你的域名） |
+| 本地目录 | `C:\Users\xiaxi\Desktop\project\homepage` |
 
-- 目标域名：**https://www.xiaxinmeng.com**
-- 视觉风格：学术排版（衬线标题 + 细分隔线 + 留白），浅色 / 深色双主题
+一个**零依赖的纯静态**个人学术主页：只有 HTML / CSS / JS，没有框架、没有构建步骤、没有 npm 依赖。
+改内容只需要编辑 `index.html`。
+
+- 学术排版：衬线标题 + 细分隔线 + 大留白，浅色 / 深色双主题
 - 双语：右上角「中 / EN」一键切换
 - 响应式：手机、平板、桌面都适配，支持打印导出为 PDF
 
@@ -20,6 +26,7 @@ homepage/
 ├── robots.txt              ← 搜索引擎抓取规则
 ├── sitemap.xml             ← 站点地图
 ├── .nojekyll               ← 告诉 GitHub Pages 不要用 Jekyll 处理
+├── .gitattributes          ← 二进制文件不做换行符转换（别删）
 ├── .gitignore
 └── assets/
     ├── css/style.css       ← 所有样式（配色变量集中在文件顶部 :root）
@@ -33,101 +40,88 @@ homepage/
 
 ## 二、本地预览
 
-直接双击 `index.html` 即可看到页面。
-如果想用本地服务器（更接近线上环境），在项目目录执行：
+直接双击 `index.html` 即可。想用本地服务器：
 
 ```bash
-# Python 3
 python -m http.server 8000
-# 然后浏览器打开 http://localhost:8000
+# 浏览器打开 http://localhost:8000
 ```
 
 ---
 
-## 三、托管方案怎么选（重要）
+## 三、当前的部署方案
 
-> **关键限制：GitHub 免费账号的 Pages 功能只能从「公开仓库」发布。**
-> 想让仓库保持 **private** 同时又用 GitHub Pages，需要 GitHub Pro（约 $4/月）。
-> 所以「私有仓库 + 完全免费」推荐走 **Cloudflare Pages**，它对私有仓库的支持是免费的。
+仓库 `xiaxinmeng.github.io` **已经存在、且是 public 的空仓库**，所以直接走 GitHub Pages 就行 —— 免费，不用配置任何 CI。
 
-| 方案 | 仓库是否私有 | 费用 | 难度 | 说明 |
-|---|---|---|---|---|
-| **A. 私有仓库 + Cloudflare Pages** | ✅ 私有 | 免费 | 易 | **推荐**，免费版支持私有仓库、自动 HTTPS、全球 CDN、带宽不限量 |
-| B. 私有仓库 + GitHub Pro + Pages | ✅ 私有 | $4/月 | 易 | 全程留在 GitHub，配置最少 |
-| C. 公开仓库 + GitHub Pages | ❌ 源码公开 | 免费 | 易 | 完全免费，但仓库里所有文件任何人可见 |
-| D. 私有源码仓库 → Actions 推送到公开 pages 仓库 | ✅ 私有 | 免费 | 中 | 免费版的「私有源码」变通做法，需要配置一个 Token，见附录 |
+- 仓库名 `xiaxinmeng.github.io` 是 GitHub 的**用户站点仓库**，站点直接挂在根路径 `/`，所以 `index.html` 放在根目录是正确的。
+- 文件名必须是 `<你的用户名>.github.io`，且在这个用户名下只能有一个。它**必须保持 public** 才能在免费账号下开启 Pages。
 
-关于「仅通过域名访问」的实际情况，请先看第六节。
+> ⚠️ 你之前提到希望项目设为 private。**免费账号无法从 private 仓库发布 GitHub Pages**（需要 GitHub Pro，约 $4/月）。如果坚持要私有源码，改用 Cloudflare Pages 托管（同样免费，且支持私有仓库），做法见 **附录 A**。
 
 ---
 
-## 四、方案 A（推荐）：私有仓库 + Cloudflare Pages
+## 四、推送代码
 
-### 1. 把本地项目推到一个私有仓库
+推送通道已经配好了，你只需要做三步。
 
-先在 GitHub 网页上新建一个仓库，例如 `homepage`，**Visibility 选 Private**，不要勾选任何初始化文件。
-然后在本地项目目录执行（把 `你的用户名` 换掉）：
+### 1. 把公钥添加到 GitHub
+
+浏览器打开 https://github.com/settings/keys → **New SSH key** → Title 随便填（例如 `xiaxi-desktop`），Key type 选 **Authentication Key**，把下面这一整行粘进去：
+
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJkInA3SdkmRwQLHJtDgF9Fs0o5czhJRXih6jKamzTYM 663979162@qq.com
+```
+
+> 如果打不开 github.com 网页：这是网络问题，跟仓库无关。可以试试手机热点，或者开代理/VPN 后再添加。
+
+### 2. 验证连接
 
 ```bash
-git init
-git add .
-git commit -m "init: academic homepage"
-git branch -M main
-git remote add origin https://github.com/你的用户名/homepage.git
+ssh -T git@github.com
+```
+
+出现 `Hi xiaxinmeng! You've successfully authenticated...` 就成功了（这句提示里不会给你 shell，[退出码是 1 属于正常](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection)）。
+
+### 3. 推送
+
+```bash
+cd "C:\Users\xiaxi\Desktop\project\homepage"
 git push -u origin main
 ```
 
-### 2. 接入 Cloudflare Pages
+### 关于网络（已经替你处理好了）
 
-1. 打开 https://dash.cloudflare.com/ 注册/登录（免费）
-2. 左侧 **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-3. 授权 GitHub，选择刚才那个**私有**仓库
-4. 构建设置：
-   - Framework preset：**None**
-   - Build command：**留空**
-   - Build output directory：**/**
-5. 点 **Save and Deploy**，一分钟后会得到一个 `xxx.pages.dev` 的临时地址，先点开确认页面正常
+实测你这台机器：国内站点 0.1 秒通，但 **`github.com:443` 直连超时**；而 SSH 的 22 端口和 `ssh.github.com:443` 都能连上。
+所以 `C:\Users\xiaxi\.ssh\config` 里已经把 `github.com` 指向 `ssh.github.com:443`，走 SSH 推送比 HTTPS 稳得多，以后不用再改。
 
-### 3. 绑定域名 www.xiaxinmeng.com
+以后日常提交就是：
 
-1. 在 Pages 项目里进入 **Custom domains** → **Set up a custom domain** → 填 `www.xiaxinmeng.com`
-2. 按提示操作 DNS：
-   - **域名 DNS 已托管在 Cloudflare**：会自动帮你加一条 CNAME 记录，点确认即可
-   - **域名在阿里云 / 腾讯云等其他注册商**：把域名的 NS 改成 Cloudflare 给的两个名称服务器（推荐），或者手动添加
-     `CNAME  www  →  你的项目名.pages.dev`
-3. 等待状态变成 **Active**（通常几分钟）
-4. 建议再加一条跳转：`xiaxinmeng.com`（不带 www）→ 301 跳到 `www.xiaxinmeng.com`
-   - Cloudflare 后台 → **Rules** → **Redirect Rules** 新建一条即可
-5. HTTPS 证书由 Cloudflare 自动签发，无需手动配置
-
-以后每次 `git push`，Cloudflare Pages 会自动重新部署，通常 30 秒 ~ 2 分钟生效。
+```bash
+git add .
+git commit -m "更新内容"
+git push
+```
 
 ---
 
-## 五、方案 B / C：用 GitHub Pages
+## 五、开启 GitHub Pages 并绑定域名
 
-### 步骤
-
-1. 新建仓库。
-   - 方案 C：选择 **Public**
-   - 方案 B：选择 **Private**（需要 GitHub Pro 订阅，且要在 Settings → Billing 里确认账户支持）
-   - 仓库名建议用 `<你的用户名>.github.io`，这样站点直接挂在根路径；用其他名字也可以（比如 `homepage`），只是默认地址会多一层 `/homepage/`
-2. 推送代码（命令同方案 A 第 1 步）
-3. 仓库 **Settings** → 左侧 **Pages**
-   - **Source** 选 `Deploy from a branch`
-   - **Branch** 选 `main`，目录选 `/ (root)` → **Save**
-4. 等 1–2 分钟，访问 `https://<你的用户名>.github.io/` 应该能看到页面
-5. 在 **Pages** 页面 → **Custom domain** 填入 `www.xiaxinmeng.com` → **Save**
+1. 仓库 **Settings** → 左侧 **Pages**
+2. **Source** 选 `Deploy from a branch` → **Branch** 选 `main` → 目录选 `/ (root)` → **Save**
+3. 等 1–2 分钟，浏览器打开 https://xiaxinmeng.github.io/ 应该能看到页面
+4. 回到 **Pages** 页面 → **Custom domain** 填入 `www.xiaxinmeng.com` → **Save**
    （仓库根目录的 `CNAME` 文件已经写好了同样的值，两边保持一致即可）
-6. 等 DNS 检查通过（十几分钟到几小时），勾选 **Enforce HTTPS**
+5. 等 DNS 检查通过（十几分钟到几小时），勾选 **Enforce HTTPS**
 
-### DNS 记录怎么填
+---
+
+## 六、DNS 记录
 
 在域名注册商（阿里云、腾讯云、Cloudflare、Namecheap…）的解析设置里添加：
 
 | 类型 | 主机记录 | 记录值 |
 |---|---|---|
-| CNAME | `www` | `<你的用户名>.github.io` |
+| CNAME | `www` | `xiaxinmeng.github.io` |
 | A | `@` | `185.199.108.153` |
 | A | `@` | `185.199.109.153` |
 | A | `@` | `185.199.110.153` |
@@ -137,27 +131,23 @@ git push -u origin main
 | AAAA | `@` | `2606:50c0:8002::153` |
 | AAAA | `@` | `2606:50c0:8003::153` |
 
-- `www` 那条是主域名生效的关键；根域（`@`）的 A 记录是为了让 `xiaxinmeng.com` 也能访问，GitHub 会把它跳转到 www。
-- 国内注册商注意：境外解析生效通常几分钟，最长可能 24 小时。如果注册商要求「域名实名认证」，先完成认证否则解析会被拦。
-- 域名指向 GitHub / Cloudflare 这类境外服务器，**不需要 ICP 备案**；只有将来把站点迁到中国大陆境内的服务器才需要备案。
+- `www` 那条是关键，必须填 `xiaxinmeng.github.io`，**不要**填完整 URL、不要带 `https://`、末尾不要加点。
+- 根域（`@`）的 A/AAAA 记录是为了让 `xiaxinmeng.com` 也能访问，GitHub 会自动把它跳转到 www。
+- 国内注册商注意：如果注册商要求域名实名认证，先完成认证，否则解析会被拦。
+- 域名指向 GitHub 的境外服务器，**不需要 ICP 备案**；只有将来把站点搬到中国大陆境内的服务器才需要。
+- 验证：`nslookup www.xiaxinmeng.com` 应该返回 `185.199.108.153` 这类地址。
 
----
+### 关于「仅通过域名访问」
 
-## 六、关于「仅通过域名访问」
-
-几点实际情况，避免踩坑：
-
-1. **GitHub Pages 绑定自定义域名后，访问 `<用户名>.github.io/...` 会自动 301 跳转到 `www.xiaxinmeng.com`**，所以对外来说只有你的域名这一个入口。
-2. **Cloudflare Pages 的 `xxx.pages.dev` 默认地址仍然可以直接访问**。如果介意，在 Cloudflare 里加一条 Redirect Rule 把 `*.pages.dev` 跳到主域名；或者干脆只走方案 B/C。
-3. **仓库是否 private 与网页是否公开是两件事**。`private` 保护的是源码；而个人主页本身只要挂在网上，任何知道域名的人都能打开。互联网上没有「只有我知道的公开网页」。
-4. **不想被搜索引擎收录**：`index.html` 的 `<head>` 里已经留好了一行注释，把
+1. 绑定自定义域名后，访问 `xiaxinmeng.github.io` 会被 GitHub 自动 301 跳转到 `www.xiaxinmeng.com`，对外只有你的域名这一个入口。
+2. **仓库 public ≠ 网页被索引**，但反过来也成立：**仓库 public 意味着源码任何人可见**。个人主页本身没什么秘密，一般不必在意。
+3. **不想被搜索引擎收录**：把 `index.html` 的 `<head>` 里这一行的注释符去掉
 
    ```html
    <!-- <meta name="robots" content="noindex,nofollow"> -->
    ```
 
-   的注释符去掉即可；同时可以把 `robots.txt` 改成 `Disallow: /`。
-   反过来，学术主页通常**希望**被搜到（方便同行找到你），所以默认保持允许收录。
+   同时把 `robots.txt` 改成 `Disallow: /`。学术主页通常**希望**被搜到（方便同行找到你），所以默认保持允许收录。
 
 ---
 
@@ -173,12 +163,12 @@ git push -u origin main
 <p data-zh="中文内容" data-en="English content">中文内容</p>
 ```
 
-只改 `data-zh` 和 `data-en`，**标签中间那份也要一起改**（浏览器加载瞬间显示的是它，避免闪烁）。
+只改 `data-zh` 和 `data-en`，**标签中间那份也要一起改**（首屏在 JS 执行前显示的是它，避免闪烁）。
 
 ### 增加一篇论文
 
-复制 `index.html` 里任意一个 `<li class="pub"> … </li>` 整块，粘到对应年份的 `<ol class="pubs">` 里，改标题和作者即可。
-把「本人姓名」用 `<b>…</b>` 包起来，样式已经处理好了。
+复制任意一个 `<li class="pub"> … </li>` 整块，粘到对应年份的 `<ol class="pubs">` 里，改标题和作者即可。
+本人姓名用 `<b>…</b>` 包起来，样式已经处理好了。
 
 ### 增加一个新板块
 
@@ -189,12 +179,12 @@ git push -u origin main
 
 ### 换头像 / 简历
 
-- 头像：把 `assets/img/avatar.svg` 换成你的照片，命名保持一致即可（推荐正方形、≥400×400）。用 JPG/PNG 的话记得同时改 `index.html` 里 `<img class="avatar" src="...">` 的路径。
-- 简历：把你的 CV 命名为 `cv.pdf` 覆盖掉 `assets/files/cv.pdf`。
+- 头像：把 `assets/img/avatar.svg` 换成你的照片，文件名保持一致即可（推荐正方形、≥400×400）。如果用 JPG/PNG，记得同时改 `index.html` 里 `<img class="avatar" src="...">` 的路径。
+- 简历：把你的 CV 命名为 `cv.pdf` 覆盖 `assets/files/cv.pdf`。
 
 ### 换配色
 
-打开 `assets/css/style.css`，最上面的 `:root` 里改这几个变量就能整体换风格：
+打开 `assets/css/style.css`，改最上面 `:root` 里的几个变量就能整体换风格：
 
 ```css
 --accent: #1c4e8a;   /* 主色：链接、下划线、按钮 */
@@ -202,60 +192,67 @@ git push -u origin main
 --bg:     #ffffff;   /* 背景色 */
 ```
 
+### 改完自检
+
+```bash
+PYTHONIOENCODING=utf-8 python "$HOME/.workbuddy/skills/personal-homepage-site/scripts/check_html.py" index.html 404.html
+```
+
+会检查标签是否闭合、`data-zh` / `data-en` 是否配对、引用的本地文件是否存在。
+
 ---
 
 ## 八、常见问题
 
-**打开域名显示 404 / Not Found**
+**推送时提示 `Permission denied (publickey)`**
+公钥还没加到 GitHub，回到第四节的第 1 步。
+
+**推送时提示连接超时**
+先 `ssh -T git@github.com` 看是否能认证。如果是网络原因，试试手机热点或代理。
+
+**打开域名显示 404**
 仓库里必须有一个叫 `index.html` 的**根目录**文件；确认 Pages 的 Source 选的是 `main` + `/ (root)`。
 
-**域名打不开，浏览器提示 DNS 解析错误**
-先用 `nslookup www.xiaxinmeng.com` 看是否解析到了 `185.199.108.153` 这一类地址。解析没生效通常是：记录填错、还没过 TTL、或者域名没完成实名认证。
+**域名打不开，提示 DNS 解析错误**
+`nslookup www.xiaxinmeng.com` 看是否解析到 `185.199.108.153` 一类地址。没生效通常是：记录填错、TTL 没到、域名未实名认证。
 
 **HTTPS 一直转圈 / 无法签发证书**
-DNS 刚改完要等 GitHub 重新校验，通常几小时。确认 CNAME 里没有多余的空格，且只有一个域名。
+DNS 改完要等 GitHub 重新校验，通常几小时。确认 `CNAME` 文件里只有一个域名、前后没有空格。
 
 **改了代码但网站没变**
-浏览器缓存（Ctrl+F5 强刷），或部署还在队列里（GitHub Pages/Cloudflare 一般 1–2 分钟）。
-
-**想让 www 和裸域都能开**
-裸域用上表里的 A/AAAA 记录，然后以 `www` 为主域名；GitHub 会自动把裸域跳转到 www。Cloudflare 用 Redirect Rule 达到同样效果。
+浏览器缓存（Ctrl+F5 强刷），或部署还在队列里（一般 1–2 分钟）。
 
 ---
 
-## 附录：方案 D —— 私有源码 + 免费的 GitHub Pages
+## 附录 A：想把仓库改成 private 怎么办
 
-原理：源码放在私有仓库，用 GitHub Actions 在云端把产物推送到另一个**公开**仓库，由那个公开仓库提供 Pages 服务。
+免费账号的 GitHub Pages 不支持 private 仓库。两条路：
 
-1. 新建一个公开仓库（如 `xiaxinmeng.github.io`），用来承载网页
-2. 生成一个 Personal Access Token（Settings → Developer settings → Fine-grained tokens），只授予对该公开仓库的 `Contents: Read and write` 权限
-3. 在私有仓库里添加 Secret：Settings → Secrets and variables → Actions → `PAGES_TOKEN`
-4. 在私有仓库新增 `.github/workflows/deploy.yml`：
+**路线 1 · 升级 GitHub Pro**（约 $4/月）
+把仓库改成 private，其余步骤完全不变。
 
-```yaml
-name: Deploy to public pages repo
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Push site to public repo
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          personal_token: ${{ secrets.PAGES_TOKEN }}
-          external_repository: 你的用户名/xiaxinmeng.github.io
-          publish_branch: main
-          publish_dir: ./
-          cname: www.xiaxinmeng.com
-```
+**路线 2 · 换成 Cloudflare Pages**（免费，支持私有仓库）
+1. 把仓库改成 private
+2. https://dash.cloudflare.com → **Workers & Pages** → **Create** → **Pages** → **Connect to Git** → 选这个仓库
+3. 构建设置：Framework preset **None**，Build command **留空**，Build output directory **/**
+4. **Custom domains** 里绑定 `www.xiaxinmeng.com`，按提示加 DNS 记录
+5. 以后每次 `git push` 自动重新部署，30 秒 ~ 2 分钟生效
 
-5. 之后在公开仓库的 Settings → Pages 里按第五节配置即可
-
-> 注意：这个方案下网页文件在公开仓库中可见（这是 GitHub Pages 免费版的固有限制），只是「源码工程」保持私有。如果你的源码和网页本来就是同一份文件（本项目就是纯静态），那方案 C 和方案 D 的效果基本一样 —— 这种情况下推荐直接用方案 A 或方案 C。
+注意：用 Cloudflare Pages 时，仓库名是不是 `xiaxinmeng.github.io` 就无所谓了，它只是个名字。
 
 ---
+
+## 附录 B：本次完成情况
+
+- [x] 站点搭建（首页 + 404 + 样式 + 脚本 + 占位头像/CV）
+- [x] 部署配置文件（`CNAME` / `.nojekyll` / `robots.txt` / `sitemap.xml` / `.gitattributes`）
+- [x] 本地 git 仓库初始化并完成首次提交
+- [x] 远程地址关联到 `xiaxinmeng/xiaxinmeng.github.io`
+- [x] 生成 SSH 密钥并配置 `~/.ssh/config`（走 `ssh.github.com:443` 绕过直连限制）
+- [ ] **把公钥添加到 GitHub**（需要你在浏览器操作，见第四节）
+- [ ] 推送代码
+- [ ] 开启 Pages、绑定域名、配置 DNS 解析
+- [ ] 用真实资料替换页面上的占位内容
 
 最后更新：2026-10-14
+
